@@ -11,7 +11,7 @@ Content-Type: application/json
 }
 ###
 
-GET http://localhost:3002/movies/12/
+GET http://localhost:3002/movies/1/
 ###
 
 PUT http://localhost:3002/movies/12/
@@ -24,7 +24,7 @@ Content-Type: application/json
 }
 ###
 
-DELETE http://localhost:3002/movies/9/
+DELETE http://localhost:3002/movies/8/
 ###
 
 GET http://localhost:3002/directors/
@@ -32,4 +32,4 @@ GET http://localhost:3002/directors/
 ###
 
 
-GET http://localhost:3002/directors/5/movies/
+GET http://localhost:3002/directors/8/movies/
