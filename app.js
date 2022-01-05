@@ -22,15 +22,6 @@ initializeDBAndServer = async () => {
 
 initializeDBAndServer();
 
-const covertObj = (obj) => {
-  return {
-    movieId: obj.movie_id,
-    directorId: obj.director_id,
-    movieName: obj.movie_name,
-    leadActor: obj.lead_actor,
-  };
-};
-
 const convertDirectorObj = (dirObj) => {
   return {
     directorId: dirObj.director_id,
@@ -42,13 +33,9 @@ const convertDirectorObj = (dirObj) => {
 
 app.get("/movies/", async (request, response) => {
   const allMovies = `
-    SELECT movie_name FROM Movie;`;
+    SELECT movie_name AS movieName FROM movie;`;
   allMovieQuery = await db.all(allMovies);
-  response.send(
-    allMovieQuery.map((each) => ({
-      movieName: each.movie_name,
-    }))
-  );
+  response.send(allMovieQuery);
 });
 
 // API 2
@@ -71,9 +58,15 @@ app.post("/movies/", async (request, response) => {
 app.get("/movies/:movieId/", async (request, response) => {
   const { movieId } = request.params;
   const getMovie = `
-    SELECT * FROM movie WHERE movie_id = ${movieId};`;
-  const output = await db.get(getMovie);
-  response.send(convertObj(output));
+    SELECT
+    movie_id AS movieId,
+    director_id AS directorId,
+    movie_name AS movieName,
+    lead_actor AS leadActor
+    FROM movie
+    WHERE movie_id = ${movieId};`;
+  const output = await db.all(getMovie);
+  response.send(output);
 });
 
 // API 4
