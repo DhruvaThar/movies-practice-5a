@@ -11,8 +11,8 @@ initializeDBAndServer = async () => {
       filename: pathDB,
       driver: sqlite3.Database,
     });
-    app.listen(3001, () => {
-      console.log("Server running at http://localhost:3001/");
+    app.listen(3002, () => {
+      console.log("Server running at http://localhost:3002/");
     });
   } catch (e) {
     console.log(`DB Error:${e.message}`);
@@ -22,13 +22,33 @@ initializeDBAndServer = async () => {
 
 initializeDBAndServer();
 
+const covertObj = (obj) => {
+  return {
+    movieId: obj.movie_id,
+    directorId: obj.director_id,
+    movieName: obj.movie_name,
+    leadActor: obj.lead_actor,
+  };
+};
+
+const convertDirectorObj = (dirObj) => {
+  return {
+    directorId: dirObj.director_id,
+    directorName: dirObj.director_name,
+  };
+};
+
 // API 1
 
 app.get("/movies/", async (request, response) => {
   const allMovies = `
     SELECT movie_name FROM Movie;`;
   allMovieQuery = await db.all(allMovies);
-  response.send(allMovieQuery);
+  response.send(
+    allMovieQuery.map((each) => ({
+      movieName: each.movie_name,
+    }))
+  );
 });
 
 // API 2
@@ -51,9 +71,9 @@ app.post("/movies/", async (request, response) => {
 app.get("/movies/:movieId/", async (request, response) => {
   const { movieId } = request.params;
   const getMovie = `
-    SELECT * FROM Movie WHERE movie_id = ${movieId};`;
+    SELECT * FROM movie WHERE movie_id = ${movieId};`;
   const output = await db.get(getMovie);
-  response.send(output);
+  response.send(convertObj(output));
 });
 
 // API 4
@@ -85,9 +105,9 @@ app.delete("/movies/:movieId/", (request, response) => {
 
 app.get("/directors/", async (request, response) => {
   const Query = `
-    SELECT * FROM Director;`;
+    SELECT * FROM director;`;
   const allDirectors = await db.all(Query);
-  response.send(allDirectors);
+  response.send(allDirectors.map((each) => convertDirectorObj(each)));
 });
 
 // API 7
@@ -97,6 +117,6 @@ app.get("/directors/:directorId/movies/", async (request, response) => {
   const movieQuery = `
     SELECT movie_name FROM Movie WHERE director_id = ${directorId};`;
   const directorMovies = await db.all(movieQuery);
-  response.send(directorMovies);
+  response.send(directorMovies.map((each) => ({ movieName: each.movie_name })));
 });
 module.exports = app;
